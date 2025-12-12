@@ -2,6 +2,7 @@
 import React from "react";
 import { getGitHubProfile } from "../services/github";
 import Image from "next/image";
+import Link from "next/link";
 
 export default async function AboutPage() {
 	const profile = await getGitHubProfile();
@@ -9,93 +10,99 @@ export default async function AboutPage() {
 	return (
 		<section
 			id="about"
-			className="w-full mx-auto max-h-[110vh] h-[full] overflow-y-scroll scroll-m-0"
+			className="w-full mx-auto max-w-7xl px-4 py-8 md:py-12 md:px-8 space-y-12 min-h-screen overflow-y-auto"
 		>
-			<div className="flex flex-col md:flex-row justify-self-start md:justify-self-center gap-6 my-3">
-				<Image
-					src={profile.avatar_url}
-					alt="GitHub Avatar"
-					className="rounded-full border shadow self-center md:self-start"
-					width={65}
-					height={65}
-				></Image>
-				<div className="text-center md:text-left">
-					<h1 className="text-3xl md:text-4xl font-semibold text-[#DAA520]">
-						{profile.name}
-					</h1>
-					<p className="text-muted text-sm md:text-lg my-1 md:my-2">
-						{profile.bio}
-					</p>
-					<section
-						id="social-links"
-						className="flex gap-4 mx-3 my-1 justify-center md:justify-start md:mx-4"
-					>
-						<a
+			{/* Profile Header */}
+			<div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 animate-in fade-in zoom-in duration-500">
+				<div className="relative group shrink-0">
+					<div className="absolute -inset-1 bg-gradient-to-r from-[#DAA520] to-yellow-600 rounded-full blur opacity-30 group-hover:opacity-70 transition duration-500"></div>
+					<Image
+						src={profile.avatar_url}
+						alt="GitHub Avatar"
+						className="relative rounded-full border-2 border-[#DAA520]/20 shadow-2xl object-cover"
+						width={140}
+						height={140}
+						priority
+					/>
+				</div>
+				
+				<div className="flex flex-col items-center md:items-start text-center md:text-left space-y-4 max-w-2xl">
+					<div>
+						<h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#DAA520] via-yellow-400 to-[#DAA520]">
+							{profile.name}
+						</h1>
+						<p className="text-lg md:text-xl text-muted-foreground mt-2 font-light">
+							{profile.bio}
+						</p>
+					</div>
+
+					<div className="flex gap-4 items-center">
+						<Link
 							href={profile.html_url}
 							target="_blank"
 							rel="noopener noreferrer"
+							className="p-2 rounded-full bg-white/5 hover:bg-white/10 hover:scale-110 transition-all duration-300 border border-white/5 hover:border-[#DAA520]/50"
 						>
 							<Image
 								src="https://torresjdev.github.io/Nextjs-Asset-Host/assets/icons/social/github.svg"
-								alt="github-image"
-								className="hover:animate-bounce"
+								alt="GitHub"
 								width={24}
 								height={24}
-							></Image>
-						</a>
-						<a
+								className="opacity-80 hover:opacity-100"
+							/>
+						</Link>
+						<Link
 							href="https://linkedin.com/in/torresjdev"
 							target="_blank"
-							aria-label="LinkedIn"
+							rel="noopener noreferrer"
+							className="p-2 rounded-full bg-white/5 hover:bg-white/10 hover:scale-110 transition-all duration-300 border border-white/5 hover:border-[#DAA520]/50"
 						>
 							<Image
 								src="https://torresjdev.github.io/Nextjs-Asset-Host/assets/icons/social/linkedIn.svg"
-								alt="github-image"
-								className="hover:animate-bounce"
+								alt="LinkedIn"
 								width={24}
 								height={24}
-							></Image>
-						</a>
-					</section>
+								className="opacity-80 hover:opacity-100"
+							/>
+						</Link>
+					</div>
 				</div>
 			</div>
-			<p className="text-muted text-sm md:text-xl my-1 md:my-2 text-center">
-				💻 I&#39;m software engineer with hands-on experience in full-stack
-				development, system design, and database work. My background in Computer
-				Information Systems gives me the foundation to understand both the
-				technical and business side of software projects.
-			</p>
-			<section className="mx-auto max-w-[80vw]">
-				<div className="block justify-items-center my-1 w-full mx-auto gap-3">
-					{/* <a href="https://github.com/anuraghazra/github-readme-stats"> */}
-					<img
-						src="https://github-readme-stats.vercel.app/api/top-langs/?username=TorresjDev&theme=tokyonight&layout=compact&hide=jupyter+notebook"
-						alt="Top Languages"
-						className="m-1 h-[25vh] w-[60vw] lg:w-[40vw] rounded-lg shadow"
-					/>
-					{/* </a> */}
-					<img
-						src="https://github-readme-stats.vercel.app/api?username=TorresjDev&show_icons=true&theme=tokyonight&count_private=true&hide=contribs"
-						alt="GitHub Stats"
-						className="m-1 h-[17vh] lg:h-[25vh] w-[60vw] rounded-lg shadow"
-					/>
 
-					<img
-						alt="Top Languages"
-						src="https://github-readme-stats.vercel.app/api/wakatime?username=@@Jtorres&layout=compact&theme=tokyonight&hide=text,other,binary,tsconfig,markdown,xml,scss,git,git+config,json,YAML,image+(svg),mdx,prisma,c"
-						className="m-1 h-[17vh] lg:h-[27vh] w-[63vw] rounded-lg shadow"
-					/>
+			{/* Bio Section */}
+			<div className="relative p-6 md:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-xl">
+				<p className="text-lg md:text-xl leading-relaxed text-gray-200/90 font-light">
+					<span className="mr-2 text-2xl">💻</span>
+					I&#39;m a software engineer with hands-on experience in full-stack
+					development, system design, and database work. My background in Computer
+					Information Systems gives me the foundation to understand both the
+					technical and business side of software projects.
+				</p>
+			</div>
+
+			{/* GitHub Stats Grid */}
+			<section className="space-y-8 animate-in slide-in-from-bottom-5 duration-700 delay-200">
+				<div className="flex justify-center">
+					<div className="relative group overflow-hidden rounded-xl border border-white/10 shadow-2xl hover:shadow-[#DAA520]/10 hover:border-[#DAA520]/30 transition-all duration-500 bg-black/40">
+						<img 
+							src="https://githubcard.com/TorresjDev.svg?d=ej5sfIat" 
+							alt="GitHub Card" 
+							className="w-full max-w-2xl h-auto object-contain transform group-hover:scale-[1.02] transition-transform duration-500" 
+						/>
+					</div>
 				</div>
-				<div
-					id="github-contributions"
-					className=" mt-2 md:mt-4 justify-items-center my-1 w-full mx-auto"
-				>
-					<h2 className="font-bold text-lg">Github Contributions</h2>
-					<img
-						src="https://ghchart.rshah.org/TorresjDev"
-						alt="GitHub Contributions"
-						className="w-full max-w-[75vw] xl:max-w-[60vw] rounded-lg shadow p-3 text-bold"
-					/>
+
+				<div id="github-contributions" className="flex flex-col items-center gap-4 w-full">
+					<h2 className="text-xl md:text-2xl font-bold text-[#DAA520]/90 tracking-wide uppercase text-sm">
+						Contribution Activity
+					</h2>
+					<div className="w-full overflow-hidden rounded-xl border border-white/10 bg-white/5 p-4 md:p-6 shadow-inner hover:bg-white/[0.07] transition-colors">
+						<img
+							src="https://ghchart.rshah.org/DAA520/TorresjDev"
+							alt="GitHub Contributions"
+							className="w-full h-auto min-w-[600px] mx-auto opacity-90 hover:opacity-100 transition-opacity"
+						/>
+					</div>
 				</div>
 			</section>
 		</section>

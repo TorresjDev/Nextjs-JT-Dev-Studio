@@ -1,4 +1,4 @@
-import { Navbar, NavbarBrand, NavbarContent } from "@nextui-org/navbar";
+import { Navbar, NavbarBrand, NavbarContent } from "@heroui/navbar";
 import Link from "next/link";
 import Image from "next/image";
 

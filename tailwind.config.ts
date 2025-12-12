@@ -1,4 +1,4 @@
-import { nextui } from "@nextui-org/theme";
+import { heroui } from "@heroui/theme";
 import type { Config } from "tailwindcss";
 import typography from "@tailwindcss/typography";
 
@@ -8,7 +8,7 @@ export default {
 		"./src/pages/**/*.{js,ts,jsx,tsx,md,mdx}",
 		"./src/components/**/*.{js,ts,jsx,tsx,md,mdx}",
 		"./src/app/**/*.{js,ts,jsx,tsx,md,mdx}",
-		"./node_modules/@nextui-org/theme/dist/components/(button|navbar|ripple|spinner).js",
+		"./node_modules/@heroui/theme/dist/components/(button|navbar|ripple|spinner).js",
 	],
 	theme: {
 		extend: {
@@ -65,6 +65,6 @@ export default {
 	},
 	plugins: [
 		typography(), // ✅ call as function
-		nextui(),
+		heroui(),
 	],
 } satisfies Config;
