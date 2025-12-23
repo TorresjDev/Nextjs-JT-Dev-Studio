@@ -1,9 +1,10 @@
 "use client";
-import { Sidebar, SidebarContent } from "../../ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter } from "../../ui/sidebar";
 import AboutSidebarGroup from "./AboutSidebarGroup";
 import WalkthroughSidebarGroup from "./GuidesSidebarGroup";
 // import PostSidebarGroup from "./PostSidebarGroup";
 import SupportSidebarGroup from "./SupportSidebarGroup";
+import UserMenu from "../UserMenu";
 
 export function SidebarNav() {
 	return (
@@ -17,6 +18,9 @@ export function SidebarNav() {
 				{/* need group for comments*/}
 				{/* need group for themes */}
 			</SidebarContent>
+			<SidebarFooter className="border-t border-white/5 pb-20 md:pb-4">
+				<UserMenu dropdownAlign="left" />
+			</SidebarFooter>
 		</Sidebar>
 	);
 }

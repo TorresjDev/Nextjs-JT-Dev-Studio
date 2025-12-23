@@ -2,7 +2,7 @@ name: Build and Deploy Next.js App
 
 on:
   push:
-    branches: [main, repo-merge-donations-jar]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -23,6 +23,11 @@ jobs:
 
       # Coinbase Configuration
       COINBASE_API_KEY: ${{ secrets.COINBASE_API_KEY }}
+
+      # Supabase Configuration
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
 
     steps:
       - name: Checkout code

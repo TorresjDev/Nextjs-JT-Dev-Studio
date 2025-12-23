@@ -1,10 +1,11 @@
 import { Navbar, NavbarBrand, NavbarContent } from "@heroui/navbar";
 import Link from "next/link";
 import Image from "next/image";
+import UserMenu from "./UserMenu";
 
 export default function Navigation() {
 	return (
-		<Navbar className="absolute top-0 left-0 !max-w-[100vw] z-[60] bg-transparent border-b-1 h-14">
+		<Navbar className="absolute top-0 left-0 max-w-[100vw]! z-60 bg-transparent border-b h-14">
 			<NavbarContent justify="start" className="relative">
 				<Link href="/">
 					<NavbarBrand>
@@ -29,7 +30,11 @@ export default function Navigation() {
 							/>
 						</div>
 					</NavbarBrand>
-				</Link>{" "}
+				</Link>
+			</NavbarContent>
+
+			<NavbarContent justify="end">
+				<UserMenu showName={false} dropdownPlacement="bottom" />
 			</NavbarContent>
 		</Navbar>
 	);
