@@ -4,8 +4,8 @@ import Image from "next/image";
 
 export default function Navigation() {
 	return (
-		<Navbar className="absolute top-0 left-0 !max-w-[100vw] z-[60] bg-transparent border-b-1">
-			<NavbarContent justify="start" className="absolute top-0 left-0">
+		<Navbar className="absolute top-0 left-0 !max-w-[100vw] z-[60] bg-transparent border-b-1 h-14">
+			<NavbarContent justify="start" className="relative">
 				<Link href="/">
 					<NavbarBrand>
 						<Image

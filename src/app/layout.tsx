@@ -33,7 +33,7 @@ export default function RootLayout({
 							<aside>
 								<SidebarNav />
 							</aside>
-							<main className="w-full flex flex-1 mx-2 mt-24 sm:mt-20 md:mt-16 p-3 md:p-1">
+							<main className="w-full flex flex-1 mx-2 mt-24 sm:mt-20 md:mt-16 p-3 md:p-1 transition-all duration-300 ease-in-out md:ml-[15rem] group-data-[state=collapsed]/sidebar-wrapper:md:ml-[3rem]">
 								<SidebarTrigger />
 								<section className="w-full flex flex-col mx-auto min-h-[95vh] overflow-y-auto px-2">
 									<Suspense

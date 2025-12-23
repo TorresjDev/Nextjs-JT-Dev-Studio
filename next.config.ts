@@ -8,22 +8,23 @@ const nextConfig: NextConfig = {
 	// Skip API routes during static generation
 	experimental: {
 		optimizePackageImports: [
-			"@nextui-org/button",
-			"@nextui-org/navbar",
+			"@heroui/navbar",
+			"@heroui/theme",
 			"@radix-ui/react-tooltip",
 			"framer-motion",
+			"lucide-react",
 		],
 	},
 
 	// Enhanced image configuration
 	images: {
-		domains: [
-			"torresjdev.github.io",
-			"fonts.googleapis.com",
-			"avatars.githubusercontent.com",
-			"github-readme-streak-stats.herokuapp.com",
-			"github-readme-stats.vercel.app",
-			"ghchart.rshah.org",
+		remotePatterns: [
+			{ protocol: "https", hostname: "torresjdev.github.io" },
+			{ protocol: "https", hostname: "fonts.googleapis.com" },
+			{ protocol: "https", hostname: "avatars.githubusercontent.com" },
+			{ protocol: "https", hostname: "github-readme-streak-stats.herokuapp.com" },
+			{ protocol: "https", hostname: "github-readme-stats.vercel.app" },
+			{ protocol: "https", hostname: "ghchart.rshah.org" },
 		],
 	},
 

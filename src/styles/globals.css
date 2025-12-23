@@ -1,8 +1,55 @@
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100");
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Tailwind v4 CSS-first theme configuration */
+@theme {
+	/* Custom colors */
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+
+	/* Sidebar colors */
+	--color-sidebar: hsl(var(--sidebar-background));
+	--color-sidebar-foreground: hsl(var(--sidebar-foreground));
+	--color-sidebar-primary: hsl(var(--sidebar-primary));
+	--color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+	--color-sidebar-accent: hsl(var(--sidebar-accent));
+	--color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+	--color-sidebar-border: hsl(var(--sidebar-border));
+	--color-sidebar-ring: hsl(var(--sidebar-ring));
+
+	/* Custom animation */
+	--animate-flare-spark: flare-spark 2.5s ease forwards;
+
+	/* Custom keyframes */
+	@keyframes flare-spark {
+		0% {
+			opacity: 0;
+			transform: scale(0.8);
+		}
+		77% {
+			opacity: 0;
+			transform: scale(0.8);
+		}
+		82% {
+			opacity: 1;
+			transform: scale(1.1);
+		}
+		88% {
+			opacity: 0.8;
+			transform: scale(1.1);
+		}
+		93% {
+			opacity: 1;
+			transform: scale(1);
+		}
+		100% {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+}
 
 /* src/app/globals.css (or wherever your global styles live) */
 
@@ -24,6 +71,7 @@
 	--black: #000000;
 	--white: #ffffff;
 	--shadow: #333333;
+	--navbar-height: 3.5rem; /* 56px - matches top-14 used by sidebar */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -56,11 +104,12 @@ body {
 	}
 
 	* {
-		@apply border-border;
+		border-color: var(--sidebar-border);
 	}
 
 	body {
-		@apply bg-background text-foreground;
+		background-color: var(--background);
+		color: var(--foreground);
 	}
 
 	/* .light {
@@ -98,7 +147,7 @@ body {
 
 @layer utilities {
 	.border-border {
-		@apply border-gray-300; /* Change this to your desired border style */
+		border-color: #d1d5db; /* gray-300 equivalent */
 	}
 }
 

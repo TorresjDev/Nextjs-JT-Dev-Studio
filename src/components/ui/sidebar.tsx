@@ -19,7 +19,7 @@ import Icon from "./icon";
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "16rem";
+const SIDEBAR_WIDTH = "14.5rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
@@ -138,6 +138,7 @@ const SidebarProvider = React.forwardRef<
 								...style,
 							} as React.CSSProperties
 						}
+						data-state={state}
 						className={cn(
 							"group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-transparent",
 							className
@@ -196,15 +197,11 @@ const Sidebar = React.forwardRef<
 					<SheetContent
 						data-sidebar="sidebar"
 						data-mobile="true"
-						className="w-[--sidebar-width] bg-transparent p-0 text-sidebar-foreground [&>button]:hidden"
-						style={
-							{
-								"--sidebar-width": SIDEBAR_WIDTH_MOBILE,
-							} as React.CSSProperties
-						}
-						side={side}
+						className="!w-full !max-w-full !inset-x-0 !top-14 !h-auto !max-h-[70vh] bg-zinc-900/98 backdrop-blur-xl border-b border-[#DAA520]/30 p-0 text-sidebar-foreground [&>button]:hidden shadow-2xl rounded-b-2xl overflow-y-auto"
+						side="top"
 					>
-						<div className="flex h-full w-full flex-col">{children}</div>
+						{/* Mobile Menu Content */}
+						<div className="flex flex-col w-full py-4 px-2">{children}</div>
 					</SheetContent>
 				</Sheet>
 			);
@@ -232,7 +229,7 @@ const Sidebar = React.forwardRef<
 				/>
 				<div
 					className={cn(
-						"duration-200 fixed inset-y-0 z-10 hidden h-svh-[94vh] w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex top-14",
+						"duration-200 fixed inset-y-0 z-50 hidden h-svh-[94vh] w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex top-14",
 						side === "left"
 							? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
 							: "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -246,7 +243,7 @@ const Sidebar = React.forwardRef<
 				>
 					<div
 						data-sidebar="sidebar"
-						className="flex h-full w-full flex-col bg-transparent group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
+						className="flex h-full w-[--sidebar-width*3] flex-col bg-zinc-900/95 backdrop-blur-xl group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow"
 					>
 						{children}
 					</div>
@@ -270,7 +267,16 @@ const SidebarTrigger = React.forwardRef<
 			variant="ghost"
 			size="icon"
 			className={cn(
-				"h-12 w-12 md:h-10 md:w-9 absolute right-2 top-2 z-[61] hover:text-[#DAA520]/90 md:relative md:m-3",
+				// Mobile: in navbar, far right | Desktop: on sidebar border
+				"h-14 w-14 md:h-10 md:w-10 z-[61] hover:text-[#DAA520]/90 shrink-0",
+				"absolute transition-all duration-300 ease-in-out",
+				// Mobile: top right of navbar
+				"top-1 right-4",
+				// Desktop: on sidebar border edge
+				"md:top-16 md:right-auto md:-translate-x-1/2",
+				state === "expanded" 
+					? "md:left-[var(--sidebar-width)]" 
+					: "md:left-[var(--sidebar-width-icon)]",
 				className
 			)}
 			onClick={(event) => {
@@ -282,12 +288,12 @@ const SidebarTrigger = React.forwardRef<
 			{state === "expanded" ? (
 				<Icon
 					name="right_panel_open"
-					className="align-bottom !text-white !text-4xl"
+					className="align-bottom !text-white !text-5xl md:!text-4xl"
 				/>
 			) : (
 				<Icon
 					name="left_panel_open"
-					className="align-bottom !text-white !text-4xl"
+					className="align-bottom !text-white !text-5xl md:!text-4xl"
 				/>
 			)}
 
@@ -415,8 +421,9 @@ const SidebarContent = React.forwardRef<
 		<div
 			ref={ref}
 			data-sidebar="content"
+			// width of the sidebar * 3
 			className={cn(
-				"flex min-h-0 flex-1 flex-col gap-1 overflow-auto group-data-[collapsible=icon]:overflow-hidden mt-9 md:mt-0",
+				"flex min-h-0 flex-1 flex-col gap-1 overflow-auto group-data-[collapsible=icon]:overflow-hidden mt-9 md:mt-0 ",
 				className
 			)}
 			{...props}
@@ -705,7 +712,7 @@ const SidebarMenuSub = React.forwardRef<
 		ref={ref}
 		data-sidebar="menu-sub"
 		className={cn(
-			"mx-[1.1rem] flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5",
+			"mx-[1.1rem] flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5 whitespace-nowrap",
 			"group-data-[collapsible=icon]:hidden",
 			className
 		)}
