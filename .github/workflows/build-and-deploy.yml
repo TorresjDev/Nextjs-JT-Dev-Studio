@@ -12,9 +12,9 @@ jobs:
 
     env:
       # Site Configuration
-      NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-      NEXT_PUBLIC_GITHUB_USERNAME: ${{ secrets.NEXT_PUBLIC_GITHUB_USERNAME }}
-      NEXT_PUBLIC_WAKATIME_USERNAME: ${{ secrets.NEXT_PUBLIC_WAKATIME_USERNAME }}
+      SITE_URL: ${{ secrets.SITE_URL }}
+      NEXT_GITHUB_USERNAME: ${{ secrets.NEXT_GITHUB_USERNAME }}
+      WAKATIME_USERNAME: ${{ secrets.WAKATIME_USERNAME }}
 
       # Stripe Configuration
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}

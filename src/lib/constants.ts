@@ -3,7 +3,7 @@ export const APP_CONFIG = {
 	name: "JT Dev Studio",
 	description:
 		"A comprehensive developer studio built with Next.js, featuring interactive walkthrough guides, project showcases, and cutting-edge development tools.",
-	url: "https://nextjs-app-plum-one.vercel.app",
+	url: process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || "https://jt-devstudio.tech",
 	author: {
 		name: "JT Torres",
 		github: "TorresjDev",

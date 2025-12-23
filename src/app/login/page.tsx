@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { login, signup } from './actions'
+import { login, signup, signInWithGithub } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { LogIn, UserPlus, Github, Mail, Lock } from 'lucide-react'
@@ -31,16 +31,16 @@ export default function LoginPage() {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="w-full max-w-md p-8 relative z-10"
       >
-        <div className="bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-3xl p-8 shadow-2xl overflow-hidden relative">
+        <div className="bg-white/3 backdrop-blur-xl border-white/8 rounded-3xl p-8 shadow-2xl overflow-hidden relative">
           {/* Subtle line effect */}
-          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+          <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-blue-500/30 to-transparent" />
           
           <div className="text-center mb-8">
             <motion.h1 
               key={isLogin ? 'login-head' : 'signup-head'}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-4xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent mb-2"
+              className="text-4xl font-bold bg-linear-to-r from-white to-white/60 bg-clip-text text-transparent mb-2"
             >
               {isLogin ? 'Welcome Back' : 'Create Account'}
             </motion.h1>
@@ -60,7 +60,7 @@ export default function LoginPage() {
                   type="email"
                   placeholder="name@example.com"
                   required
-                  className="bg-white/[0.02] border-white/10 pl-10 h-12 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-300"
+                  className="bg-white/2 border-white/10 pl-10 h-12 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-300"
                 />
               </div>
             </div>
@@ -75,7 +75,7 @@ export default function LoginPage() {
                   type="password"
                   placeholder="••••••••"
                   required
-                  className="bg-white/[0.02] border-white/10 pl-10 h-12 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-300"
+                  className="bg-white/2 border-white/10 pl-10 h-12 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all duration-300"
                 />
               </div>
             </div>
@@ -106,14 +106,16 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button 
-              variant="outline" 
-              className="w-full h-11 bg-white/[0.02] border-white/10 hover:bg-white/[0.05] hover:border-white/20 text-white/80 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
-              onClick={() => {/* Implement OAuth if needed later */}}
-            >
-              <Github className="w-4 h-4" />
-              GitHub
-            </Button>
+            <form action={signInWithGithub}>
+              <Button 
+                type="submit"
+                variant="outline" 
+                className="w-full h-11 bg-white/2 border-white/10 hover:bg-white/5 hover:border-white/20 text-white/80 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+              >
+                <Github className="w-4 h-4" />
+                GitHub
+              </Button>
+            </form>
           </div>
 
           <div className="mt-8 text-center">

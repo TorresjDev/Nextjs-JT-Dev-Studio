@@ -2,7 +2,7 @@ import { env } from '@/lib/env';
 
 export async function getGitHubProfile() {
 	const response = await fetch(
-		`https://api.github.com/users/${env.NEXT_PUBLIC_GITHUB_USERNAME}`,
+		`https://api.github.com/users/${env.NEXT_GITHUB_USERNAME}`,
 		{
 			headers: {
 				Accept: "application/vnd.github+json",

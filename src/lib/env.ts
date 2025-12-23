@@ -2,8 +2,8 @@ import type { EnvironmentVariables } from "./types";
 
 // Validate environment variables
 const requiredEnvVars = {
-	NEXT_PUBLIC_GITHUB_USERNAME: process.env.NEXT_PUBLIC_GITHUB_USERNAME,
-	NEXT_PUBLIC_WAKATIME_USERNAME: process.env.NEXT_PUBLIC_WAKATIME_USERNAME,
+	NEXT_GITHUB_USERNAME: process.env.NEXT_GITHUB_USERNAME,
+	WAKATIME_USERNAME: process.env.WAKATIME_USERNAME,
 } as const;
 
 // Check for missing environment variables

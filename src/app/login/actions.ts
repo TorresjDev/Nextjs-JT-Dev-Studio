@@ -51,3 +51,22 @@ export async function signout() {
   revalidatePath('/', 'layout')
   redirect('/login')
 }
+
+export async function signInWithGithub() {
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+    options: {
+      redirectTo: `${process.env.SITE_URL}/auth/callback`,
+    },
+  })
+
+  if (error) {
+    console.error('GitHub sign in error:', error)
+    redirect('/error')
+  }
+
+  if (data.url) {
+    redirect(data.url)
+  }
+}

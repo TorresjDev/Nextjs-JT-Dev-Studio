@@ -40,6 +40,6 @@ export interface LoadingState {
 
 // Environment variables type safety
 export interface EnvironmentVariables {
-	NEXT_PUBLIC_GITHUB_USERNAME: string;
-	NEXT_PUBLIC_WAKATIME_USERNAME: string;
+	NEXT_GITHUB_USERNAME: string;
+	WAKATIME_USERNAME: string;
 }
