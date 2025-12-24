@@ -29,17 +29,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const initSession = async () => {
       try {
-        console.log('[AuthContext] Fetching initial user...')
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[AuthContext] Fetching initial user...')
+        }
         // Use getUser() instead of getSession() - it validates the JWT with Supabase
         // and is more reliable for detecting sessions set by server actions
         const { data: { user: currentUser }, error } = await supabase.auth.getUser()
         
         if (error) {
           // getUser() returns an error if no session exists, which is normal
-          console.log('[AuthContext] getUser result:', error.message)
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[AuthContext] getUser result:', error.message)
+          }
         }
         
-        console.log(`[AuthContext] Initial user result: ${currentUser?.email || 'No user'}`)
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[AuthContext] Initial user result: ${currentUser?.email || 'No user'}`)
+        }
         
         if (mounted) {
           setUser(currentUser || null)
@@ -47,7 +53,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setHasMounted(true)
         }
       } catch (err) {
-        console.error('[AuthContext] Failed to initialize session:', err)
+        if (process.env.NODE_ENV === 'development') {
+          console.error('[AuthContext] Failed to initialize session:', err)
+        }
         if (mounted) {
           setLoading(false)
           setHasMounted(true)
@@ -60,7 +68,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event: AuthChangeEvent, session: Session | null) => {
-        console.log(`[AuthContext] Auth Event: ${event} | User: ${session?.user?.email || 'None'}`)
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`[AuthContext] Auth Event: ${event} | User: ${session?.user?.email || 'None'}`)
+        }
         if (mounted) {
           setUser(session?.user || null)
           setLoading(false)

@@ -55,16 +55,26 @@ export async function signout() {
 }
 
 export async function signInWithGithub() {
+  const siteUrl = process.env.SITE_URL
+  if (!siteUrl) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('SITE_URL environment variable is not configured')
+    }
+    redirect('/error')
+  }
+
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
-      redirectTo: `${process.env.SITE_URL}/auth/callback`,
+      redirectTo: `${siteUrl}/auth/callback`,
     },
   })
 
   if (error) {
-    console.error('GitHub sign in error:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('GitHub sign in error:', error)
+    }
     redirect('/error')
   }
 
