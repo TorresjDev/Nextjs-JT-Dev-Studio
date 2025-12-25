@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
 			{ protocol: "https", hostname: "github-readme-streak-stats.herokuapp.com" },
 			{ protocol: "https", hostname: "github-readme-stats.vercel.app" },
 			{ protocol: "https", hostname: "ghchart.rshah.org" },
+			// Supabase Storage for UGC media uploads
+			{ protocol: "https", hostname: "*.supabase.co" },
 		],
 	},
 

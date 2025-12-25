@@ -51,5 +51,50 @@ Whether you are looking for technical consulting, software services, or simply w
 
 ---
 
+## 📝 UGC Feature Setup
+
+The User-Generated Content (UGC) platform allows authenticated users to create posts, upload media, and comment.
+
+### Quick Start (Local Development)
+
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+2. **Set environment variables** in `.env.local`:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   SITE_URL=http://localhost:3000
+   ```
+
+3. **Apply database migrations**:
+   - Open Supabase Dashboard → SQL Editor
+   - Run the SQL from `supabase/migrations/001_ugc_schema.sql`
+
+4. **Create storage bucket**:
+   - Supabase Dashboard → Storage → New bucket
+   - Name: `ugc-media`, Private: ✓
+
+5. **Run the dev server**:
+   ```bash
+   npm run dev
+   ```
+
+### Key Routes
+- `/posts` - Browse published posts
+- `/posts/[id]` - View post details + comments
+- `/editor/new` - Create new post
+- `/editor/[id]` - Edit your post
+
+### For Vercel Deployment
+Add these environment variables in Vercel:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SITE_URL` (your production domain)
+
+---
+
 **Crafted by Jesus Torres (JT)**  
 *Software Engineer | Creative Technologist*

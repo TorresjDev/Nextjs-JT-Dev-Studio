@@ -6,7 +6,9 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "next lint"
+		"lint": "next lint",
+		"test": "vitest",
+		"test:coverage": "vitest run --coverage"
 	},
 	"dependencies": {
 		"@heroui/navbar": "^2.2.27",
@@ -21,6 +23,11 @@
 		"@supabase/ssr": "^0.8.0",
 		"@supabase/supabase-js": "^2.89.0",
 		"@tailwindcss/typography": "^0.5.19",
+		"@tiptap/extension-placeholder": "^3.14.0",
+		"@tiptap/extension-text-style": "^3.14.0",
+		"@tiptap/extension-underline": "^3.14.0",
+		"@tiptap/react": "^3.14.0",
+		"@tiptap/starter-kit": "^3.14.0",
 		"axios": "^1.13.2",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
@@ -37,19 +44,26 @@
 		"remark-html": "^16.0.1",
 		"stripe": "^18.5.0",
 		"tailwind-merge": "^2.6.0",
-		"tailwindcss-animate": "^1.0.7"
+		"tailwindcss-animate": "^1.0.7",
+		"zod": "^4.2.1"
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3.3.3",
 		"@tailwindcss/postcss": "^4.1.18",
 		"@tailwindcss/typography": "^0.5.19",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.1",
 		"@types/node": "^20.19.27",
 		"@types/react": "^19.2.7",
 		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^5.1.2",
 		"eslint": "^9.39.2",
 		"eslint-config-next": "15.1.4",
+		"jsdom": "^27.3.0",
 		"postcss": "^8.5.6",
 		"tailwindcss": "^4.1.18",
-		"typescript": "^5.9.3"
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.16"
 	}
 }

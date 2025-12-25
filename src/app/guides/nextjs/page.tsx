@@ -129,7 +129,7 @@ export default async function NextJsPage() {
 			</div>
 
 			{/* Featured Topics */}
-			<div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-8 mb-12 text-white">
+			<div className="bg-linear-to-r from-blue-500 to-purple-600 rounded-lg p-8 mb-12 text-white">
 				<h2 className="text-2xl font-semibold mb-4">🚀 Why Learn Next.js?</h2>
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<div>
@@ -204,7 +204,7 @@ export default async function NextJsPage() {
 												</svg>
 											</div>
 										</div>
-										<div className="ml-4 flex-shrink-0">
+										<div className="ml-4 shrink-0">
 											<div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
 												<span className="text-lg">⚡</span>
 											</div>
@@ -218,7 +218,7 @@ export default async function NextJsPage() {
 			</div>
 
 			{/* Learning Path */}
-			<div className="mt-12 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-8">
+			<div className="mt-12 bg-linear-to-r from-blue-50 to-indigo-50 rounded-lg p-8">
 				<h2 className="text-2xl font-semibold text-gray-900 mb-4">
 					🎯 Recommended Learning Path
 				</h2>
