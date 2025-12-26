@@ -56,7 +56,7 @@ export default function ThankYouPage() {
 							<Link href="/">Return to Home</Link>
 						</Button>
 						<Button variant="outline" asChild>
-							<Link href="/guides">Explore Guides</Link>
+							<Link href="/posts">Browse Posts</Link>
 						</Button>
 					</div>
 

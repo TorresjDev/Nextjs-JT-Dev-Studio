@@ -21,8 +21,8 @@ export const landingCards = [
 		href: "/support",
 	},
 	{
-		title: "Walkthrough Guides",
-		desc: "Step-by-step development setups and terminal workflows.",
-		href: "/guides",
+		title: "Blog & Tutorials",
+		desc: "In-depth guides, tutorials, and development insights.",
+		href: "/posts",
 	},
 ];

@@ -2,7 +2,7 @@
 export const APP_CONFIG = {
 	name: "JT Dev Studio",
 	description:
-		"A comprehensive developer studio built with Next.js, featuring interactive walkthrough guides, project showcases, and cutting-edge development tools.",
+		"A comprehensive developer studio built with Next.js, featuring user-generated content, project showcases, and cutting-edge development tools.",
 	url: process.env.SITE_URL || "https://jt-devstudio.tech",
 	author: {
 		name: "JT Torres",
@@ -14,16 +14,8 @@ export const APP_CONFIG = {
 export const ROUTES = {
 	home: "/",
 	about: "/about",
-	guides: "/guides",
 	posts: "/posts",
 	contact: "/contact",
-} as const;
-
-export const GUIDE_CATEGORIES = {
-	"version-control": "Version Control",
-	nextjs: "Next.js Development",
-	sdlc: "SDLC Methodologies",
-	database: "Database Design",
 } as const;
 
 export const EXTERNAL_LINKS = {

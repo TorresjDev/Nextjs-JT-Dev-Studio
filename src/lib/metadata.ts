@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { APP_CONFIG } from "./constants";
-import type { GuideMetadata } from "./types";
 
 interface MetadataProps {
 	title?: string;
@@ -59,29 +58,3 @@ export function generateMetadata({
 	};
 }
 
-export function generateGuideMetadata(
-	guide: GuideMetadata,
-	slug: string
-): Metadata {
-	const url = `${APP_CONFIG.url}/guides/${guide.category}/${slug}`;
-
-	return generateMetadata({
-		title: guide.title,
-		description: guide.description,
-		url,
-		type: "article",
-	});
-}
-
-export function generateCategoryMetadata(
-	category: string,
-	description: string
-): Metadata {
-	const url = `${APP_CONFIG.url}/guides/${category}`;
-
-	return generateMetadata({
-		title: `${category} Guides`,
-		description,
-		url,
-	});
-}
