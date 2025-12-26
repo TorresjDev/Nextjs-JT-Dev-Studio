@@ -1,22 +1,5 @@
 // Type definitions for the application
 
-export interface GuideMetadata {
-	title: string;
-	description: string;
-	category: keyof typeof import("../constants").GUIDE_CATEGORIES;
-	slug: string;
-	author?: string;
-	publishedAt?: string;
-	updatedAt?: string;
-	tags?: string[];
-}
-
-export interface GuideContent {
-	metadata: GuideMetadata;
-	content: string;
-	readingTime?: number;
-}
-
 export interface NavigationItem {
 	label: string;
 	href: string;

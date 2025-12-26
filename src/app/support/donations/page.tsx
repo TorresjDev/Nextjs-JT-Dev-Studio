@@ -82,8 +82,8 @@ export default function SupportPage() {
 								✨ Recent Projects You&apos;re Supporting:
 							</h3>
 							<ul className="text-sm text-muted-foreground space-y-1 text-left max-w-md mx-auto">
-								<li>• Next.js portfolio with interactive guides</li>
-								<li>• SDLC educational walkthroughs</li>
+								<li>• Next.js portfolio with user-generated content</li>
+								<li>• Educational blog posts and tutorials</li>
 								<li>• Git/GitHub best practices documentation</li>
 								<li>• Database design and ERD tutorials</li>
 								<li>• Open-source component libraries</li>

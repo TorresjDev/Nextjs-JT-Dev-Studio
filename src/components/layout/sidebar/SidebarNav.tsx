@@ -1,7 +1,6 @@
 "use client";
 import { Sidebar, SidebarContent, SidebarFooter } from "../../ui/sidebar";
 import AboutSidebarGroup from "./AboutSidebarGroup";
-import WalkthroughSidebarGroup from "./GuidesSidebarGroup";
 import PostSidebarGroup from "./PostSidebarGroup";
 import SupportSidebarGroup from "./SupportSidebarGroup";
 import UserMenu from "../UserMenu";
@@ -11,7 +10,6 @@ export function SidebarNav() {
 		<Sidebar className="top-[60px]">
 			<SidebarContent>
 				<AboutSidebarGroup />
-				<WalkthroughSidebarGroup />
 				<PostSidebarGroup />
 				<SupportSidebarGroup />
 				{/* need group for ai resume builder*/}
