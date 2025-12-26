@@ -15,13 +15,14 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/utils/supabase/server'
 import { createPostSchema, updatePostSchema, safeParse } from './schemas'
-import type { 
-  Post, 
-  PostWithAuthor, 
-  CreatePostInput, 
+import type {
+  Post,
+  PostWithAuthor,
+  CreatePostInput,
   UpdatePostInput,
   PaginatedResponse,
-  PaginationParams 
+  PaginationParams,
+  PostCategory
 } from './types'
 
 // =============================================================================
@@ -32,7 +33,7 @@ import type {
  * Standard result type for server actions
  * Either succeeds with data, or fails with an error message
  */
-export type ActionResult<T> = 
+export type ActionResult<T> =
   | { success: true; data: T }
   | { success: false; error: string }
 
@@ -69,22 +70,22 @@ async function requireAuth(): Promise<string> {
  */
 async function ensureProfileExists(userId: string): Promise<void> {
   const supabase = await createClient()
-  
+
   // Check if profile already exists
   const { data: existingProfile } = await supabase
     .from('profiles')
     .select('id')
     .eq('id', userId)
     .single()
-  
+
   if (existingProfile) {
     return // Profile already exists
   }
-  
+
   // Get user metadata from auth
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
-  
+
   // Extract profile info from user metadata
   // GitHub OAuth provides: user_name, avatar_url, full_name, etc.
   const metadata = user.user_metadata || {}
@@ -92,7 +93,7 @@ async function ensureProfileExists(userId: string): Promise<void> {
   const displayName = metadata.full_name || metadata.name || null
   const avatarUrl = metadata.avatar_url || null
   const bio = metadata.bio || null
-  
+
   // Create the profile
   const { error } = await supabase
     .from('profiles')
@@ -103,7 +104,7 @@ async function ensureProfileExists(userId: string): Promise<void> {
       avatar_url: avatarUrl,
       bio,
     })
-  
+
   if (error) {
     console.error('Error creating profile:', error)
     // Don't throw - we'll let the post creation handle the error
@@ -125,18 +126,18 @@ async function ensureProfileExists(userId: string): Promise<void> {
 export async function createPost(input: CreatePostInput): Promise<ActionResult<Post>> {
   try {
     const userId = await requireAuth()
-    
+
     // Ensure profile exists before creating post
     await ensureProfileExists(userId)
-    
+
     // Validate input using Zod schema
     const validation = safeParse(createPostSchema, input)
     if (!validation.success) {
       return { success: false, error: validation.error }
     }
-    
+
     const supabase = await createClient()
-    
+
     const { data, error } = await supabase
       .from('posts')
       .insert({
@@ -148,15 +149,15 @@ export async function createPost(input: CreatePostInput): Promise<ActionResult<P
       })
       .select()
       .single()
-    
+
     if (error) {
       console.error('Error creating post:', error)
       return { success: false, error: 'Failed to create post' }
     }
-    
+
     // Revalidate the posts page to show the new post
     revalidatePath('/posts')
-    
+
     return { success: true, data: data as Post }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'An unexpected error occurred'
@@ -172,20 +173,20 @@ export async function createPost(input: CreatePostInput): Promise<ActionResult<P
  * @returns The updated post or an error
  */
 export async function updatePost(
-  postId: string, 
+  postId: string,
   input: UpdatePostInput
 ): Promise<ActionResult<Post>> {
   try {
     await requireAuth()
-    
+
     // Validate input
     const validation = safeParse(updatePostSchema, input)
     if (!validation.success) {
       return { success: false, error: validation.error }
     }
-    
+
     const supabase = await createClient()
-    
+
     // Build update object only with provided fields
     const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
@@ -194,23 +195,23 @@ export async function updatePost(
     if (validation.data.content !== undefined) updateData.content = validation.data.content
     if (validation.data.category !== undefined) updateData.category = validation.data.category
     if (validation.data.status !== undefined) updateData.status = validation.data.status
-    
+
     const { data, error } = await supabase
       .from('posts')
       .update(updateData)
       .eq('id', postId)
       .select()
       .single()
-    
+
     if (error) {
       console.error('Error updating post:', error)
       // RLS will prevent updating others' posts, show generic message
       return { success: false, error: 'Failed to update post. You may not have permission.' }
     }
-    
+
     revalidatePath('/posts')
     revalidatePath(`/posts/${postId}`)
-    
+
     return { success: true, data: data as Post }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'An unexpected error occurred'
@@ -227,21 +228,21 @@ export async function updatePost(
 export async function deletePost(postId: string): Promise<ActionResult<null>> {
   try {
     await requireAuth()
-    
+
     const supabase = await createClient()
-    
+
     const { error } = await supabase
       .from('posts')
       .delete()
       .eq('id', postId)
-    
+
     if (error) {
       console.error('Error deleting post:', error)
       return { success: false, error: 'Failed to delete post. You may not have permission.' }
     }
-    
+
     revalidatePath('/posts')
-    
+
     return { success: true, data: null }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'An unexpected error occurred'
@@ -257,7 +258,7 @@ export async function deletePost(postId: string): Promise<ActionResult<null>> {
  */
 export async function getPost(postId: string): Promise<PostWithAuthor | null> {
   const supabase = await createClient()
-  
+
   const { data, error } = await supabase
     .from('posts')
     .select(`
@@ -271,11 +272,11 @@ export async function getPost(postId: string): Promise<PostWithAuthor | null> {
     `)
     .eq('id', postId)
     .single()
-  
+
   if (error || !data) {
     return null
   }
-  
+
   return data as PostWithAuthor
 }
 
@@ -286,15 +287,15 @@ export async function getPost(postId: string): Promise<PostWithAuthor | null> {
  * Cursor = A pointer to a specific position in the list
  * Instead of "page 5", we say "everything after this timestamp"
  * 
- * @param params - Pagination parameters (cursor, limit)
+ * @param params - Pagination parameters (cursor, limit, category)
  * @returns Paginated list of posts
  */
 export async function getPosts(
-  params: PaginationParams = {}
+  params: PaginationParams & { category?: PostCategory } = {}
 ): Promise<PaginatedResponse<PostWithAuthor>> {
-  const { cursor, limit = 10 } = params
+  const { cursor, limit = 10, category } = params
   const supabase = await createClient()
-  
+
   // Build query
   let query = supabase
     .from('posts')
@@ -308,34 +309,40 @@ export async function getPosts(
       )
     `)
     .eq('status', 'published')
-    .order('created_at', { ascending: false })
+
+  // Filter by category if provided
+  if (category) {
+    query = query.eq('category', category)
+  }
+
+  query = query.order('created_at', { ascending: false })
     .limit(limit + 1) // Fetch one extra to check if there are more
-  
+
   // Apply cursor (if provided)
   if (cursor) {
     // Cursor format: "timestamp_id" (e.g., "2024-01-01T00:00:00Z_uuid")
     const [cursorDate, cursorId] = cursor.split('_')
     query = query.or(`created_at.lt.${cursorDate},and(created_at.eq.${cursorDate},id.lt.${cursorId})`)
   }
-  
+
   const { data, error } = await query
-  
+
   if (error) {
     console.error('Error fetching posts:', error)
     return { data: [], nextCursor: null, hasMore: false }
   }
-  
+
   // Check if there are more results
   const hasMore = data.length > limit
   const posts = hasMore ? data.slice(0, limit) : data
-  
+
   // Generate next cursor from the last item
   let nextCursor: string | null = null
   if (hasMore && posts.length > 0) {
     const lastPost = posts[posts.length - 1]
     nextCursor = `${lastPost.created_at}_${lastPost.id}`
   }
-  
+
   return {
     data: posts as PostWithAuthor[],
     nextCursor,
@@ -356,38 +363,38 @@ export async function getMyPosts(
   if (!userId) {
     return { data: [], nextCursor: null, hasMore: false }
   }
-  
+
   const { cursor, limit = 10 } = params
   const supabase = await createClient()
-  
+
   let query = supabase
     .from('posts')
     .select('*')
     .eq('author_id', userId)
     .order('updated_at', { ascending: false })
     .limit(limit + 1)
-  
+
   if (cursor) {
     const [cursorDate, cursorId] = cursor.split('_')
     query = query.or(`updated_at.lt.${cursorDate},and(updated_at.eq.${cursorDate},id.lt.${cursorId})`)
   }
-  
+
   const { data, error } = await query
-  
+
   if (error) {
     console.error('Error fetching user posts:', error)
     return { data: [], nextCursor: null, hasMore: false }
   }
-  
+
   const hasMore = data.length > limit
   const posts = hasMore ? data.slice(0, limit) : data
-  
+
   let nextCursor: string | null = null
   if (hasMore && posts.length > 0) {
     const lastPost = posts[posts.length - 1]
     nextCursor = `${lastPost.updated_at}_${lastPost.id}`
   }
-  
+
   return {
     data: posts as Post[],
     nextCursor,

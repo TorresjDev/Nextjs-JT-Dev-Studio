@@ -17,8 +17,9 @@ export default function PostSidebarGroup() {
 	const { isMobile, setOpenMobile } = useSidebar();
 
 	const postLinks = [
-		{ title: "Browse Posts", url: "/posts", icon: "📋" },
-		{ title: "Create Post", url: "/editor/new", icon: "✏️" },
+		{ title: "Create Content", url: "/editor/new", icon: "✏️" },
+		{ title: "Posts", url: "/posts", icon: "📋" },
+		{ title: "Blogs", url: "/posts/blogs", icon: "📖" },
 	];
 
 	return (
