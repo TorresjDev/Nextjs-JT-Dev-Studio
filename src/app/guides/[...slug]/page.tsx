@@ -5,6 +5,7 @@ import matter from "gray-matter";
 import { remark } from "remark";
 import remarkHtml from "remark-html";
 import remarkGfm from "remark-gfm";
+import DOMPurify from "isomorphic-dompurify";
 
 interface MarkdownContent {
 	content: string;
@@ -41,7 +42,7 @@ export default async function WalkthroughPage({ params }: PageProps) {
 
 		return (
 			<div className="prose prose-slate max-w-full p-4 prose-headings:text-gray-900 prose-p:text-gray-800 prose-li:text-gray-800 prose-strong:text-gray-900 prose-a:text-blue-700 prose-code:text-white prose-pre:bg-zinc-800 prose-pre:text-gray-100">
-				<div dangerouslySetInnerHTML={{ __html: markdownContent.content }} />
+				<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(markdownContent.content) }} />
 			</div>
 		);
 	} catch (error) {

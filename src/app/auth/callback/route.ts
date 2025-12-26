@@ -5,8 +5,10 @@ import { createClient } from '@/utils/supabase/server'
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  // if "next" is in search params, use it as the redirection URL
-  const next = searchParams.get('next') ?? '/'
+  // Validate next param to prevent open redirect attacks
+  // Must start with / but not // (which would be interpreted as protocol-relative URL)
+  const nextParam = searchParams.get('next')
+  const next = (nextParam?.startsWith('/') && !nextParam.startsWith('//')) ? nextParam : '/'
 
   if (code) {
     const supabase = await createClient()

@@ -4,17 +4,15 @@ import { getStripe } from "../../../../lib/stripe";
 export async function GET(request: Request) {
 	try {
 		// Extract session ID from query parameters
-		// const { searchParams } = new URL(request.url);
-		console.log(request);
+		const { searchParams } = new URL(request.url);
+		const session_id = searchParams.get('session_id');
 
-		const session_id = request.url;
-
-		// if (!session_id) {
-		// 	return NextResponse.json(
-		// 		{ error: "Session ID is required" },
-		// 		{ status: 400 }
-		// 	);
-		// }
+		if (!session_id) {
+			return NextResponse.json(
+				{ error: "Session ID is required" },
+				{ status: 400 }
+			);
+		}
 
 		// Get Stripe instance
 		const stripe = getStripe();
@@ -36,9 +34,8 @@ export async function GET(request: Request) {
 			`
       <html>
         <body>
-          <h1>Thanks for your order, ${
-						"name" in customer ? customer.name : "Customer"
-					}!</h1>
+          <h1>Thanks for your order, ${"name" in customer ? customer.name : "Customer"
+			}!</h1>
         </body>
       </html>
       `,

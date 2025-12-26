@@ -1,6 +1,7 @@
 // Type definitions for the application
 
 export interface GuideMetadata {
+    order: any;
 	title: string;
 	description: string;
 	category: keyof typeof import("../constants").GUIDE_CATEGORIES;

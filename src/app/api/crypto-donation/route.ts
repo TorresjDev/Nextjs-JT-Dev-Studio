@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import axios, { AxiosResponse } from "axios";
+import { z } from "zod";
+import { paymentRateLimiter, checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 // Validate environment variable exists
 const COINBASE_API_KEY = process.env.COINBASE_API_KEY;
@@ -7,6 +9,15 @@ const COINBASE_API_KEY = process.env.COINBASE_API_KEY;
 if (!COINBASE_API_KEY) {
 	console.error("COINBASE_API_KEY is not defined in environment variables");
 }
+
+// Validation schema for donation request
+const donationSchema = z.object({
+	amount: z
+		.number({ message: "Amount must be a number" })
+		.positive("Amount must be positive")
+		.min(1, "Minimum donation is $1")
+		.max(10000, "Maximum donation is $10,000"),
+});
 
 interface CoinbaseResponse {
 	data: {
@@ -16,6 +27,23 @@ interface CoinbaseResponse {
 }
 
 export async function POST(request: Request) {
+	// Rate limiting check
+	const ip = getClientIp(request);
+	const { success, remaining } = await checkRateLimit(paymentRateLimiter, ip);
+
+	if (!success) {
+		return NextResponse.json(
+			{ error: "Too many requests. Please try again later." },
+			{
+				status: 429,
+				headers: {
+					'Retry-After': '60',
+					'X-RateLimit-Remaining': String(remaining ?? 0),
+				}
+			}
+		);
+	}
+
 	try {
 		// Check if API key is available
 		if (!COINBASE_API_KEY) {
@@ -26,12 +54,21 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const { amount } = await request.json();
+		// Parse and validate request body
+		const body = await request.json();
+		const validation = donationSchema.safeParse(body);
 
-		console.log(
-			"Creating Coinbase charge with API key:",
-			COINBASE_API_KEY ? "***PRESENT***" : "MISSING"
-		);
+		if (!validation.success) {
+			return NextResponse.json(
+				{
+					error: "Invalid donation amount",
+					details: validation.error.flatten().fieldErrors
+				},
+				{ status: 400 }
+			);
+		}
+
+		const { amount } = validation.data;
 
 		// Create the charge using Coinbase Commerce API
 		const response: AxiosResponse<CoinbaseResponse> = await axios.post(

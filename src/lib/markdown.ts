@@ -12,7 +12,7 @@ export async function processMarkdown(source: string): Promise<GuideContent> {
 
 	const processedContent = await remark()
 		.use(remarkGfm)
-		.use(remarkHtml, { sanitize: false })
+		.use(remarkHtml, { sanitize: true })
 		.process(content);
 
 	const htmlContent = processedContent.toString();

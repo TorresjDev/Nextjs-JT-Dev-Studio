@@ -1,8 +1,24 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "../../../../lib/stripe";
+import { paymentRateLimiter, checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
-	console.log({ req });
+	// Rate limiting check
+	const ip = getClientIp(req);
+	const { success, remaining } = await checkRateLimit(paymentRateLimiter, ip);
+
+	if (!success) {
+		return NextResponse.json(
+			{ error: "Too many requests. Please try again later." },
+			{
+				status: 429,
+				headers: {
+					'Retry-After': '60',
+					'X-RateLimit-Remaining': String(remaining ?? 0),
+				}
+			}
+		);
+	}
 
 	try {
 		const stripe = getStripe();

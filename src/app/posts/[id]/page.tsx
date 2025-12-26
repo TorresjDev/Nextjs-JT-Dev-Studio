@@ -12,6 +12,7 @@ import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import DOMPurify from 'isomorphic-dompurify'
 import { getPost, getThreadedComments, getPostMedia, getMediaUrl } from '@/lib/ugc'
 import { CommentsSection, PostReactions, formatDistanceToNow, formatDate } from '@/components/ugc'
 
@@ -19,11 +20,11 @@ import { CommentsSection, PostReactions, formatDistanceToNow, formatDate } from 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const post = await getPost(id)
-  
+
   if (!post) {
     return { title: 'Post Not Found | JT Dev Studio' }
   }
-  
+
   return {
     title: `${post.title} | JT Dev Studio`,
     description: post.content.substring(0, 160),
@@ -109,12 +110,12 @@ async function PostContent({ postId }: { postId: string }) {
         <div className="mb-8 grid gap-4 grid-cols-1 md:grid-cols-2">
           {mediaWithUrls.map((m) => {
             if (!m.url) return null
-            
+
             const isImage = m.mime_type.startsWith('image/')
             const isVideo = m.mime_type.startsWith('video/')
             const isAudio = m.mime_type.startsWith('audio/')
             const isPdf = m.mime_type === 'application/pdf'
-            
+
             if (isImage) {
               return (
                 <div key={m.id} className="relative aspect-video rounded-lg overflow-hidden bg-muted">
@@ -127,36 +128,36 @@ async function PostContent({ postId }: { postId: string }) {
                 </div>
               )
             }
-            
+
             if (isVideo) {
               return (
-                <video 
-                  key={m.id} 
-                  src={m.url} 
-                  controls 
+                <video
+                  key={m.id}
+                  src={m.url}
+                  controls
                   className="w-full rounded-lg"
                 >
                   Your browser does not support the video tag.
                 </video>
               )
             }
-            
+
             if (isAudio) {
               return (
-                <audio 
-                  key={m.id} 
-                  src={m.url} 
-                  controls 
+                <audio
+                  key={m.id}
+                  src={m.url}
+                  controls
                   className="w-full"
                 >
                   Your browser does not support the audio tag.
                 </audio>
               )
             }
-            
+
             if (isPdf) {
               return (
-                <a 
+                <a
                   key={m.id}
                   href={m.url}
                   target="_blank"
@@ -164,7 +165,7 @@ async function PostContent({ postId }: { postId: string }) {
                   className="flex items-center gap-3 p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
                 >
                   <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zm-3 9.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm3 3c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5z"/>
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zm-3 9.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm3 3c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5z" />
                   </svg>
                   <div>
                     <p className="font-medium">{m.file_name}</p>
@@ -173,16 +174,16 @@ async function PostContent({ postId }: { postId: string }) {
                 </a>
               )
             }
-            
+
             return null
           })}
         </div>
       )}
 
       {/* Content - Render HTML from rich text editor */}
-      <div 
+      <div
         className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 prose-li:text-foreground/90 prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-blockquote:border-primary prose-blockquote:text-muted-foreground"
-        dangerouslySetInnerHTML={{ __html: post.content }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
       />
 
       {/* Reactions */}
@@ -229,7 +230,7 @@ export default async function PostPage({ params }: { params: Promise<{ id: strin
   return (
     <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Back Link */}
-      <Link 
+      <Link
         href="/posts"
         className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
       >
