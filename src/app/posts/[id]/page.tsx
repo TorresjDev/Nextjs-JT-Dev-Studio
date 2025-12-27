@@ -14,20 +14,54 @@ import Link from 'next/link'
 import Image from 'next/image'
 import DOMPurify from 'isomorphic-dompurify'
 import { getPost, getThreadedComments, getPostMedia, getMediaUrl } from '@/lib/ugc'
-import { CommentsSection, PostReactions, formatDistanceToNow, formatDate } from '@/components/ugc'
+import { CommentsSection, PostReactions, DeletePostButton, formatDistanceToNow, formatDate } from '@/components/ugc'
+import { createClient } from '@/utils/supabase/server'
+
+// UUID validation regex
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+/**
+ * Validate if a string is a valid UUID format
+ */
+function isValidUUID(id: string): boolean {
+  return UUID_REGEX.test(id)
+}
+
+/**
+ * Get current user ID from session
+ */
+async function getCurrentUserId(): Promise<string | null> {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    return user?.id ?? null
+  } catch {
+    return null
+  }
+}
 
 // Generate metadata dynamically based on the post
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const post = await getPost(id)
 
-  if (!post) {
+  // Validate UUID format first
+  if (!isValidUUID(id)) {
     return { title: 'Post Not Found | JT Dev Studio' }
   }
 
-  return {
-    title: `${post.title} | JT Dev Studio`,
-    description: post.content.substring(0, 160),
+  try {
+    const post = await getPost(id)
+
+    if (!post) {
+      return { title: 'Post Not Found | JT Dev Studio' }
+    }
+
+    return {
+      title: `${post.title} | JT Dev Studio`,
+      description: post.content.substring(0, 160),
+    }
+  } catch {
+    return { title: 'Post Not Found | JT Dev Studio' }
   }
 }
 
@@ -35,164 +69,183 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
  * Post Content Component
  */
 async function PostContent({ postId }: { postId: string }) {
-  const [post, comments, media] = await Promise.all([
-    getPost(postId),
-    getThreadedComments(postId),
-    getPostMedia(postId),
-  ])
-
-  if (!post) {
+  // Validate UUID format before making database queries
+  if (!isValidUUID(postId)) {
     notFound()
   }
 
-  // Get signed URLs for media
-  const mediaWithUrls = await Promise.all(
-    media.map(async (m) => ({
-      ...m,
-      url: await getMediaUrl(m.storage_path),
-    }))
-  )
+  try {
+    const [post, comments, media, currentUserId] = await Promise.all([
+      getPost(postId),
+      getThreadedComments(postId),
+      getPostMedia(postId),
+      getCurrentUserId(),
+    ])
 
-  return (
-    <article className="bg-card rounded-xl border border-border/50 p-8">
-      {/* Category + Status */}
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-sm font-medium px-3 py-1 rounded-full bg-primary/10 text-primary capitalize">
-          {post.category}
-        </span>
-        {post.status === 'draft' && (
-          <span className="text-sm font-medium px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-500">
-            Draft
+    if (!post) {
+      notFound()
+    }
+
+    // Get signed URLs for media
+    const mediaWithUrls = await Promise.all(
+      media.map(async (m) => ({
+        ...m,
+        url: await getMediaUrl(m.storage_path),
+      }))
+    )
+
+    return (
+      <article className="bg-card rounded-xl border border-border/50 p-8">
+        {/* Category + Status */}
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-sm font-medium px-3 py-1 rounded-full bg-primary/10 text-primary capitalize">
+            {post.category}
           </span>
-        )}
-      </div>
+          {post.status === 'draft' && (
+            <span className="text-sm font-medium px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-500">
+              Draft
+            </span>
+          )}
+        </div>
 
-      {/* Title */}
-      <h1 className="text-3xl md:text-4xl font-bold mb-4">{post.title}</h1>
+        {/* Title */}
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">{post.title}</h1>
 
-      {/* Author + Metadata */}
-      <div className="flex items-center gap-4 mb-8 pb-8 border-b border-border">
-        {post.author && (
-          <div className="flex items-center gap-3">
-            {/* Avatar */}
-            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-muted">
-              {post.author.avatar_url ? (
-                <Image
-                  src={post.author.avatar_url}
-                  alt={post.author.display_name || post.author.username || 'Author'}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-muted-foreground text-lg font-medium">
-                  {(post.author.display_name || post.author.username || 'U')[0].toUpperCase()}
-                </div>
-              )}
-            </div>
-            {/* Name + Date */}
-            <div>
-              <p className="font-medium">
-                {post.author.display_name || post.author.username || 'Anonymous'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {formatDate(post.created_at)}
-                {post.updated_at !== post.created_at && (
-                  <span> · Updated {formatDistanceToNow(post.updated_at)}</span>
-                )}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Media Gallery */}
-      {mediaWithUrls.length > 0 && (
-        <div className="mb-8 grid gap-4 grid-cols-1 md:grid-cols-2">
-          {mediaWithUrls.map((m) => {
-            if (!m.url) return null
-
-            const isImage = m.mime_type.startsWith('image/')
-            const isVideo = m.mime_type.startsWith('video/')
-            const isAudio = m.mime_type.startsWith('audio/')
-            const isPdf = m.mime_type === 'application/pdf'
-
-            if (isImage) {
-              return (
-                <div key={m.id} className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+        {/* Author + Metadata */}
+        <div className="flex items-center gap-4 mb-8 pb-8 border-b border-border">
+          {post.author && (
+            <div className="flex items-center gap-3">
+              {/* Avatar */}
+              <div className="relative w-12 h-12 rounded-full overflow-hidden bg-muted">
+                {post.author.avatar_url ? (
                   <Image
-                    src={m.url}
-                    alt={m.file_name}
+                    src={post.author.avatar_url}
+                    alt={post.author.display_name || post.author.username || 'Author'}
                     fill
                     className="object-cover"
                   />
-                </div>
-              )
-            }
-
-            if (isVideo) {
-              return (
-                <video
-                  key={m.id}
-                  src={m.url}
-                  controls
-                  className="w-full rounded-lg"
-                >
-                  Your browser does not support the video tag.
-                </video>
-              )
-            }
-
-            if (isAudio) {
-              return (
-                <audio
-                  key={m.id}
-                  src={m.url}
-                  controls
-                  className="w-full"
-                >
-                  Your browser does not support the audio tag.
-                </audio>
-              )
-            }
-
-            if (isPdf) {
-              return (
-                <a
-                  key={m.id}
-                  href={m.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                >
-                  <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zm-3 9.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm3 3c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5z" />
-                  </svg>
-                  <div>
-                    <p className="font-medium">{m.file_name}</p>
-                    <p className="text-xs text-muted-foreground">PDF Document</p>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-muted-foreground text-lg font-medium">
+                    {(post.author.display_name || post.author.username || 'U')[0].toUpperCase()}
                   </div>
-                </a>
-              )
-            }
-
-            return null
-          })}
+                )}
+              </div>
+              {/* Name + Date */}
+              <div>
+                <p className="font-medium">
+                  {post.author.display_name || post.author.username || 'Anonymous'}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {formatDate(post.created_at)}
+                  {post.updated_at !== post.created_at && (
+                    <span> · Updated {formatDistanceToNow(post.updated_at)}</span>
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
-      )}
 
-      {/* Content - Render HTML from rich text editor */}
-      <div
-        className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 prose-li:text-foreground/90 prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-blockquote:border-primary prose-blockquote:text-muted-foreground"
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
-      />
+        {/* Media Gallery */}
+        {mediaWithUrls.length > 0 && (
+          <div className="mb-8 grid gap-4 grid-cols-1 md:grid-cols-2">
+            {mediaWithUrls.map((m) => {
+              if (!m.url) return null
 
-      {/* Reactions */}
-      <PostReactions postId={postId} />
+              const isImage = m.mime_type.startsWith('image/')
+              const isVideo = m.mime_type.startsWith('video/')
+              const isAudio = m.mime_type.startsWith('audio/')
+              const isPdf = m.mime_type === 'application/pdf'
 
-      {/* Comments Section */}
-      <CommentsSection postId={postId} comments={comments} />
-    </article>
-  )
+              if (isImage) {
+                return (
+                  <div key={m.id} className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+                    <Image
+                      src={m.url}
+                      alt={m.file_name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )
+              }
+
+              if (isVideo) {
+                return (
+                  <video
+                    key={m.id}
+                    src={m.url}
+                    controls
+                    className="w-full rounded-lg"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )
+              }
+
+              if (isAudio) {
+                return (
+                  <audio
+                    key={m.id}
+                    src={m.url}
+                    controls
+                    className="w-full"
+                  >
+                    Your browser does not support the audio tag.
+                  </audio>
+                )
+              }
+
+              if (isPdf) {
+                return (
+                  <a
+                    key={m.id}
+                    href={m.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                  >
+                    <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zm-3 9.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm3 3c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5z" />
+                    </svg>
+                    <div>
+                      <p className="font-medium">{m.file_name}</p>
+                      <p className="text-xs text-muted-foreground">PDF Document</p>
+                    </div>
+                  </a>
+                )
+              }
+
+              return null
+            })}
+          </div>
+        )}
+
+        {/* Content - Render HTML from rich text editor */}
+        <div
+          className="prose prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-em:text-foreground/90 prose-li:text-foreground/90 prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-muted prose-blockquote:border-primary prose-blockquote:text-muted-foreground"
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+        />
+
+        {/* Reactions */}
+        <PostReactions postId={postId} />
+
+        {/* Delete Button - Only shows for post owner */}
+        <DeletePostButton
+          postId={postId}
+          authorId={post.author_id}
+          currentUserId={currentUserId}
+        />
+
+        {/* Comments Section */}
+        <CommentsSection postId={postId} comments={comments} />
+      </article>
+    )
+  } catch (error) {
+    // Log error for debugging but don't expose to user
+    console.error('Error loading post:', error)
+    notFound()
+  }
 }
 
 /**
